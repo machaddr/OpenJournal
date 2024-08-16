@@ -489,10 +489,10 @@
     </script>
     <!-- Create a menu of categories for the user to select -->
     <script>
-        const categories = ["&#128187; Code", "&#127810; Ecology",
+        const categories = ["&#127810; Ecology",
             "&#128176; Economy", "&#8987; History",
             "&#960; Mathematics", "&#x1F4AD; Philosophy", 
-            "&#9883; Physics", "&#129504; Psychology",
+            "&#9883; Physics", "&#128187; Programming", "&#129504; Psychology",
             "&#128300; Science", "&#128101; Society",
             "&#9881; Technology", "&#9658; Videos"];
     
@@ -520,52 +520,6 @@
                 endlessScrollCheckbox.checked = false;
                 // If clicked then disable endless scroll checkbox
                 endlessScrollCheckbox.disabled = true;
-
-                // If the user clicks on a category Code
-                if (category === "&#128187; Code") {
-                    fetch(`https://hn.algolia.com/api/v1/search_by_date?query=Show%20HN&tags=show_hn`)
-                        .then(response => response.json())
-                        .then(data => {
-                            // Clear the news feed before adding new stories
-                            newsFeed.innerHTML = '';
-                            data.hits.forEach((hit, index) => {
-                                const storyElement = document.createElement('div');
-                                storyElement.innerHTML = `
-                                    <h4>${index + 1}. <img src="https://www.google.com/s2/favicons?domain=${new URL(hit.url).hostname}" alt="${new URL(hit.url).hostname} favicon">
-                                    <a href="${hit.url}" style="user-select: none;">${hit.title}</a></h4>
-                                    <p>Source: ${new URL(hit.url).hostname}</p>
-                                    <p>${new Date(hit.created_at_i * 1000).toLocaleString('en-GB', { hour12: false, hourCycle: 'h23' })}</p>
-                                    <button class="like-button" data-story-id="${hit.objectID}" data-liked="false">&#x2661;</button>
-                                    <span class="like-count" id="like-count-${hit.objectID}">0</span>
-                                `;
-
-                                // Add event listener to like button
-                                const likeButton = storyElement.querySelector('.like-button');
-                                likeButton.addEventListener('click', () => {
-                                    const storyId = likeButton.dataset.storyId;
-                                    const liked = likeButton.dataset.liked === 'true';
-                                    const likeCount = document.getElementById(`like-count-${storyId}`);
-                                    likeButton.dataset.liked = !liked;
-                                    likeButton.innerHTML = liked ? '&#x2661;' : '&#x2665;';
-                                    likeCount.textContent = Number(likeCount.textContent) + (liked ? -1 : 1);
-
-                                    // Save liked status to localStorage
-                                    const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
-                                    likedStories[storyId] = !liked;
-                                    localStorage.setItem('likedStories', JSON.stringify(likedStories));
-                                });
-
-                                // Load liked status from localStorage
-                                const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
-                                if (likedStories[hit.objectID]) {
-                                    likeButton.dataset.liked = 'true';
-                                    likeButton.innerHTML = '&#x2665;';
-                                }
-                                newsFeed.appendChild(storyElement);
-                                newsFeed.appendChild(document.createElement('p')); // Adds spacing
-                            });
-                        });
-                }
                 
                 // If the user clicks on a category Ecology
                 if (category === "&#127810; Ecology") {
@@ -800,6 +754,52 @@
                 // If the user clicks on a category Physics
                 if (category === "&#9883; Physics") {
                     fetch(`https://hn.algolia.com/api/v1/search_by_date?query=Physics&tags=story`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Clear the news feed before adding new stories
+                            newsFeed.innerHTML = '';
+                            data.hits.forEach((hit, index) => {
+                                const storyElement = document.createElement('div');
+                                storyElement.innerHTML = `
+                                    <h4>${index + 1}. <img src="https://www.google.com/s2/favicons?domain=${new URL(hit.url).hostname}" alt="${new URL(hit.url).hostname} favicon">
+                                    <a href="${hit.url}" style="user-select: none;">${hit.title}</a></h4>
+                                    <p>Source: ${new URL(hit.url).hostname}</p>
+                                    <p>${new Date(hit.created_at_i * 1000).toLocaleString('en-GB', { hour12: false, hourCycle: 'h23' })}</p>
+                                    <button class="like-button" data-story-id="${hit.objectID}" data-liked="false">&#x2661;</button>
+                                    <span class="like-count" id="like-count-${hit.objectID}">0</span>
+                                `;
+
+                                // Add event listener to like button
+                                const likeButton = storyElement.querySelector('.like-button');
+                                likeButton.addEventListener('click', () => {
+                                    const storyId = likeButton.dataset.storyId;
+                                    const liked = likeButton.dataset.liked === 'true';
+                                    const likeCount = document.getElementById(`like-count-${storyId}`);
+                                    likeButton.dataset.liked = !liked;
+                                    likeButton.innerHTML = liked ? '&#x2661;' : '&#x2665;';
+                                    likeCount.textContent = Number(likeCount.textContent) + (liked ? -1 : 1);
+
+                                    // Save liked status to localStorage
+                                    const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
+                                    likedStories[storyId] = !liked;
+                                    localStorage.setItem('likedStories', JSON.stringify(likedStories));
+                                });
+
+                                // Load liked status from localStorage
+                                const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
+                                if (likedStories[hit.objectID]) {
+                                    likeButton.dataset.liked = 'true';
+                                    likeButton.innerHTML = '&#x2665;';
+                                }
+                                newsFeed.appendChild(storyElement);
+                                newsFeed.appendChild(document.createElement('p')); // Adds spacing
+                            });
+                        });
+                }
+
+                // If the user clicks on a category Code
+                if (category === "&#128187; Programming") {
+                    fetch(`https://hn.algolia.com/api/v1/search_by_date?query=Show%20HN&tags=show_hn`)
                         .then(response => response.json())
                         .then(data => {
                             // Clear the news feed before adding new stories
