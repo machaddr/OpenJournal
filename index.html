@@ -19,6 +19,80 @@
 <body>
     <button><div><span id="current-time"></span></div></button>
     <button onclick="window.location.href='https://openjournal.eu.org/forum/public/'">Forum</button>
+    <button id="hearts-button">My Hearts</button>
+    <script>
+        // create a page called Hearts where the person see the liked stories
+        const likedStoriesPage = document.createElement('div');
+        likedStoriesPage.style.display = 'none';
+        likedStoriesPage.style.position = 'fixed';
+        likedStoriesPage.style.top = '0';
+        likedStoriesPage.style.left = '0';
+        likedStoriesPage.style.width = '100%';
+        likedStoriesPage.style.height = '100%';
+        likedStoriesPage.style.backgroundColor = 'white';
+        likedStoriesPage.style.zIndex = '9999';
+        likedStoriesPage.style.overflow = 'auto';
+        likedStoriesPage.style.padding = '20px';
+        likedStoriesPage.style.boxSizing = 'border-box';
+        document.body.appendChild(likedStoriesPage);
+
+        // add an option to remove the news entries from the liked stories page
+        const clearButton = document.createElement('button');
+        clearButton.innerHTML = 'Clear All';
+        clearButton.style.position = 'fixed';
+        clearButton.style.top = '10px';
+        clearButton.style.right = '30px';
+        clearButton.addEventListener('click', () => {
+            localStorage.removeItem('likedStories');
+            likedStoriesPage.innerHTML = '';
+            // refresh to the main page
+            location.reload();
+        });
+        likedStoriesPage.appendChild(clearButton);
+
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = 'Close';
+        closeButton.style.position = 'fixed';
+        closeButton.style.top = '10px';
+        closeButton.style.left = '30px';
+        closeButton.addEventListener('click', () => {
+            likedStoriesPage.style.display = 'none';
+        });
+        likedStoriesPage.appendChild(closeButton);
+
+        const openButton = document.getElementById('hearts-button');
+        openButton.addEventListener('click', () => {
+            likedStoriesPage.style.display = 'block';
+            likedStoriesPage.innerHTML = ''; // Clear existing content to avoid duplication
+            likedStoriesPage.appendChild(clearButton);
+            likedStoriesPage.appendChild(closeButton);
+
+            // add a DOM element to the page to update the liked stories
+            const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
+            Object.keys(likedStories).forEach(storyId => {
+                if (likedStories[storyId]) {
+                    fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const { title = 'No Title', url: source = 'Unknown Source', time } = data;
+                            const date = new Date(time * 1000).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
+                            const storyElement = document.createElement('div');
+                            storyElement.innerHTML = `
+                                <h4><a href="${source}" style="user-select: none;">${title}</a></h4>
+                                <p style="color: black;">Source: <a href="${source}" style="color: blue;">${source}</a></p>
+                                <p style="color: black;">${date}</p>
+                                <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
+                            `;
+                            likedStoriesPage.insertBefore(storyElement, likedStoriesPage.firstChild);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching story details:', error);
+                        });
+                }                
+            });
+        });
+    </script>
+    <div style="margin-top: 20px;"></div>
     <button id="menu-button">Menu</button>
     <div id="menu" style="display: none;">
         <div>
@@ -1147,83 +1221,6 @@
         navigationMenu.appendChild(topButton);
         navigationMenu.appendChild(bottomButton);
         document.body.appendChild(navigationMenu);
-    </script>
-    <script>
-        // create a page called Hearts where the person see the liked stories
-        const likedStoriesPage = document.createElement('div');
-        likedStoriesPage.style.display = 'none';
-        likedStoriesPage.style.position = 'fixed';
-        likedStoriesPage.style.top = '0';
-        likedStoriesPage.style.left = '0';
-        likedStoriesPage.style.width = '100%';
-        likedStoriesPage.style.height = '100%';
-        likedStoriesPage.style.backgroundColor = 'white';
-        likedStoriesPage.style.zIndex = '9999';
-        likedStoriesPage.style.overflow = 'auto';
-        likedStoriesPage.style.padding = '20px';
-        likedStoriesPage.style.boxSizing = 'border-box';
-    
-        // add an option to remove the news entries from the liked stories page
-        const clearButton = document.createElement('button');
-        clearButton.innerHTML = 'Clear All';
-        clearButton.style.position = 'fixed';
-        clearButton.style.top = '10px';
-        clearButton.style.right = '30px';
-        clearButton.addEventListener('click', () => {
-            localStorage.removeItem('likedStories');
-            likedStoriesPage.innerHTML = '';
-            // refresh to the main page
-            location.reload();
-        });
-        likedStoriesPage.appendChild(clearButton);
-    
-        const closeButton = document.createElement('button');
-        closeButton.innerHTML = 'Close';
-        closeButton.style.position = 'fixed';
-        closeButton.style.top = '10px';
-        closeButton.style.left = '30px';
-        closeButton.addEventListener('click', () => {
-            likedStoriesPage.style.display = 'none';
-        });
-        likedStoriesPage.appendChild(closeButton);
-    
-        const openButton = document.createElement('button');
-        openButton.innerHTML = 'My Hearts';
-        openButton.style.position = 'fixed';
-        openButton.style.top = '10px';
-        openButton.style.right = '100px';
-        openButton.addEventListener('click', () => {
-            likedStoriesPage.style.display = 'block';
-            likedStoriesPage.innerHTML = ''; // Clear existing content to avoid duplication
-            likedStoriesPage.appendChild(clearButton);
-            likedStoriesPage.appendChild(closeButton);
-    
-            // add a DOM element to the page to update the liked stories
-            const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
-            Object.keys(likedStories).forEach(storyId => {
-                if (likedStories[storyId]) {
-                    fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const { title = 'No Title', url: source = 'Unknown Source', time } = data;
-                            const date = new Date(time * 1000).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
-                            const storyElement = document.createElement('div');
-                            storyElement.innerHTML = `
-                                <h4><a href="${source}" style="user-select: none;">${title}</a></h4>
-                                <p style="color: black;">Source: <a href="${source}" style="color: blue;">${source}</a></p>
-                                <p style="color: black;">${date}</p>
-                                <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
-                            `;
-                            likedStoriesPage.insertBefore(storyElement, likedStoriesPage.firstChild);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching story details:', error);
-                        });
-                }                
-            });
-        });
-        document.body.appendChild(openButton);
-        document.body.appendChild(likedStoriesPage);
     </script>
 </body>
 <footer>
