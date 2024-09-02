@@ -18,7 +18,7 @@
 </head>
 <body>
     <button><div><span id="current-time"></span></div></button>
-    <button onclick="window.location.href='https://openjournal.eu.org/forum/public/'">Forum</button>
+    <button onclick="window.location.href='https://openjournal.eu.org/forum'">Forum</button>
     <button id="hearts-button">My Hearts</button>
     <script>
         // create a page called Hearts where the person see the liked stories
@@ -91,7 +91,142 @@
                 }                
             });
         });
-    </script>
+        </script>
+        <button id="comments-button">Comments</button>
+        <script>
+            // Add a comments section to each story
+            const commentsSection = document.createElement('div');
+            commentsSection.style.display = 'none';
+            commentsSection.style.position = 'fixed';
+            commentsSection.style.top = '0';
+            commentsSection.style.left = '0';
+            commentsSection.style.width = '100%';
+            commentsSection.style.height = '100%';
+            commentsSection.style.backgroundColor = 'white';
+            commentsSection.style.zIndex = '9999';
+            commentsSection.style.overflow = 'auto';
+            commentsSection.style.padding = '40px';
+            commentsSection.style.boxSizing = 'border-box';
+            document.body.appendChild(commentsSection);
+            
+            const closeCommentsButton = document.createElement('button');
+            closeCommentsButton.innerHTML = 'Close';
+            closeCommentsButton.style.position = 'fixed';
+            closeCommentsButton.style.top = '10px';
+            closeCommentsButton.style.left = '40px';
+            closeCommentsButton.addEventListener('click', () => {
+                commentsSection.style.display = 'none';
+            });
+            commentsSection.appendChild(closeCommentsButton);
+            
+            const openCommentsButton = document.getElementById('comments-button');
+            
+            openCommentsButton.addEventListener('click', () => {
+                const newsEntriesSelect = document.getElementById('news-entries');
+                const numberOfStories = parseInt(newsEntriesSelect.value, 10);
+                const showNumbersCheckbox = document.getElementById('show-numbers');
+                const showNumbers = showNumbersCheckbox.checked;
+        
+                commentsSection.style.display = 'block';
+                commentsSection.innerHTML = ''; // Clear existing content to avoid duplication
+                commentsSection.appendChild(closeCommentsButton);
+                
+                // Fetch top stories from Hacker News
+                fetch('https://hacker-news.firebaseio.com/v0/topstories.json')
+                    .then(response => response.json())
+                    .then(topStories => {
+                        // Fetch details for each top story
+                        const storyPromises = topStories.slice(0, numberOfStories).map(storyId => 
+                            fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`).then(response => response.json())
+                        );
+        
+                        Promise.all(storyPromises)
+                            .then(stories => {
+                                stories.sort((a, b) => b.time - a.time); // Sort stories by their time in descending order
+                                const newsGrid = document.createElement('div');
+                                newsGrid.style.display = 'grid';
+                                newsGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                                newsGrid.style.gap = '20px';
+                                commentsSection.appendChild(newsGrid);
+        
+                                stories.forEach((story, index) => {
+                                    const { title = 'No Title', url: source = 'Unknown Source', time, kids = [] } = story;
+                                    const date = new Date(time * 1000).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', '');
+                                    const storyElement = document.createElement('div');
+                                    storyElement.style.border = '1px solid #ccc';
+                                    storyElement.style.padding = '20px';
+                                    storyElement.style.backgroundColor = '#f9f9f9';
+                                    storyElement.innerHTML = `
+                                        ${showNumbers ? `<p>${index + 1}. </p>` : ''}
+                                        <h4><a href="${source}" style="user-select: none;">${title}</a></h4>
+                                        <p style="color: black;">Source: <a href="${source}" style="color: blue;">${source}</a></p>
+                                        <p style="color: black;">${date}</p>
+                                        <button class="load-comments-button" data-story-id="${story.id}" style="margin-bottom: 10px;">Load Comments</button>
+                                        <div class="comments-container" id="comments-${story.id}" style="display: none; margin-left: 20px;"></div>
+                                    `;
+                                    newsGrid.appendChild(storyElement); // Append stories to the news grid
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error fetching story details:', error);
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching top stories:', error);
+                    });
+            });
+        
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains('load-comments-button')) {
+                    const storyId = event.target.getAttribute('data-story-id');
+                    const commentsContainer = document.getElementById(`comments-${storyId}`);
+                    if (commentsContainer.style.display === 'block') {
+                        commentsContainer.style.display = 'none';
+                        event.target.innerHTML = 'Load Comments';
+                        return;
+                    }
+                    commentsContainer.style.display = 'block';
+                    event.target.innerHTML = 'Unload Comments';
+                    commentsContainer.innerHTML = '';
+        
+                    fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`)
+                        .then(response => response.json())
+                        .then(story => {
+                            const { kids = [] } = story;
+                            if (kids.length === 0) {
+                                commentsContainer.innerHTML = '<br>No comments available.<br>';
+                                return;
+                            }
+        
+                            const commentsPromises = kids.map(commentId => 
+                                fetch(`https://hacker-news.firebaseio.com/v0/item/${commentId}.json`).then(response => response.json())
+                            );
+                            Promise.all(commentsPromises)
+                                .then(comments => {
+                                    comments.sort((a, b) => (b.score || 0) - (a.score || 0)); // Sort comments by score (relevance)
+                                    comments.forEach(comment => {
+                                        const commentDate = new Date(comment.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', '');
+                                        const commentElement = document.createElement('div');
+                                        commentElement.style.backgroundColor = 'lightgrey';
+                                        commentElement.style.padding = '10px';
+                                        commentElement.style.marginBottom = '10px';
+                                        commentElement.innerHTML = `
+                                            <p style="color: black;">${comment.text}</p>
+                                            <p style="color: orange; background-color: black;">By: ${comment.by} on ${commentDate}</p>
+                                        `;
+                                        commentsContainer.appendChild(commentElement);
+                                    });
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching comment details:', error);
+                                });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching story details:', error);
+                        });
+                }
+            });
+        </script>
     <div style="margin-top: 20px;"></div>
     <button id="menu-button">Menu</button>
     <div id="menu" style="display: none;">
