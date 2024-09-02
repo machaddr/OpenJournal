@@ -156,10 +156,11 @@
                                     storyElement.style.border = '1px solid #ccc';
                                     storyElement.style.padding = '20px';
                                     storyElement.style.backgroundColor = '#f9f9f9';
+                                    const sourceDomain = source !== 'Unknown Source' ? new URL(source).hostname : source;
                                     storyElement.innerHTML = `
                                         ${showNumbers ? `<p>${index + 1}. </p>` : ''}
                                         <h4><a href="${source}" style="user-select: none;">${title}</a></h4>
-                                        <p style="color: black;">Source: <a href="${source}" style="color: blue;">${source}</a></p>
+                                        <p style="color: black;">Source: <a href="${source}" style="color: blue;">${sourceDomain}</a></p>
                                         <p style="color: black;">${date}</p>
                                         <button class="load-comments-button" data-story-id="${story.id}" style="margin-bottom: 10px;">Load Comments</button>
                                         <div class="comments-container" id="comments-${story.id}" style="display: none; margin-left: 20px;"></div>
@@ -212,9 +213,35 @@
                                         commentElement.style.marginBottom = '10px';
                                         commentElement.innerHTML = `
                                             <p style="color: black;">${comment.text}</p>
+                                            <button class="like-comment-button" data-comment-id="${comment.id}" style="margin-top: 10px;">&#x2661;</button>
+                                            <span id="like-count-${comment.id}">0</span>
                                             <p style="color: orange; background-color: black;">By: ${comment.by} on ${commentDate}</p>
                                         `;
                                         commentsContainer.appendChild(commentElement);
+        
+                                        // Add event listener to like button
+                                        const likeButton = commentElement.querySelector('.like-comment-button');
+                                        likeButton.addEventListener('click', () => {
+                                            const commentId = likeButton.dataset.commentId;
+                                            const liked = likeButton.dataset.liked === 'true';
+                                            const likeCount = document.getElementById(`like-count-${commentId}`);
+                                            likeButton.dataset.liked = !liked;
+                                            likeButton.innerHTML = liked ? '&#x2661;' : '&#x2665;';
+                                            likeCount.textContent = Number(likeCount.textContent) + (liked ? -1 : 1);
+        
+                                            // Save liked status to localStorage
+                                            const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
+                                            likedComments[commentId] = !liked;
+                                            localStorage.setItem('likedComments', JSON.stringify(likedComments));
+                                        });
+        
+                                        // Load liked status from localStorage
+                                        const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
+                                        if (likedComments[comment.id]) {
+                                            likeButton.dataset.liked = 'true';
+                                            likeButton.innerHTML = '&#x2665;';
+                                            document.getElementById(`like-count-${comment.id}`).textContent = '1';
+                                        }
                                     });
                                 })
                                 .catch(error => {
