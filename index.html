@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="Headlines from the Future">
-    <meta name="keywords" content="news, technology, opensource, science, mathematics, physics, programming, code">
+    <meta name="keywords" content="news, technology, opensource, science, mathematics, physics, programming, code, research">
     <meta name="author" content="André Machado">
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="1 day">
@@ -18,10 +18,11 @@
 </head>
 <body>
     <button><div><span id="current-time"></span></div></button>
+    <button onclick="window.location.href='https://openjournal.eu.org/research'">Research</button>
     <button onclick="window.location.href='https://openjournal.eu.org/forum'">Forum</button>
     <button id="hearts-button">My Hearts</button>
     <script>
-        // create a page called Hearts where the person see the liked stories
+        // Create a page called Hearts where the person sees the liked stories and comments
         const likedStoriesPage = document.createElement('div');
         likedStoriesPage.style.display = 'none';
         likedStoriesPage.style.position = 'fixed';
@@ -36,7 +37,7 @@
         likedStoriesPage.style.boxSizing = 'border-box';
         document.body.appendChild(likedStoriesPage);
 
-        // add an option to remove the news entries from the liked stories page
+        // Add an option to remove all entries from the liked stories and comments page
         const clearButton = document.createElement('button');
         clearButton.innerHTML = 'Clear All';
         clearButton.style.position = 'fixed';
@@ -44,8 +45,9 @@
         clearButton.style.right = '30px';
         clearButton.addEventListener('click', () => {
             localStorage.removeItem('likedStories');
+            localStorage.removeItem('likedComments');
             likedStoriesPage.innerHTML = '';
-            // refresh to the main page
+            // Refresh to the main page
             location.reload();
         });
         likedStoriesPage.appendChild(clearButton);
@@ -67,8 +69,22 @@
             likedStoriesPage.appendChild(clearButton);
             likedStoriesPage.appendChild(closeButton);
 
-            // add a DOM element to the page to update the liked stories
+            // Create sections for liked stories and liked comments
+            const storiesSection = document.createElement('div');
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
+            if (Object.keys(likedStories).length > 0) {
+                storiesSection.innerHTML = '<h2>Liked Stories</h2>';
+                likedStoriesPage.appendChild(storiesSection);
+            }
+
+            const commentsSection = document.createElement('div');
+            const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
+            if (Object.keys(likedComments).length > 0) {
+                commentsSection.innerHTML = '<h2>Liked Comments</h2>';
+                likedStoriesPage.appendChild(commentsSection);
+            }
+
+            // Add a DOM element to the page to update the liked stories
             Object.keys(likedStories).forEach(storyId => {
                 if (likedStories[storyId]) {
                     fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`)
@@ -81,17 +97,57 @@
                                 <h4><a href="${source}" style="user-select: none;">${title}</a></h4>
                                 <p style="color: black;">Source: <a href="${source}" style="color: blue;">${source}</a></p>
                                 <p style="color: black;">${date}</p>
+                                <button onclick="removeLikedStory('${storyId}')">Remove</button>
                                 <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
                             `;
-                            likedStoriesPage.insertBefore(storyElement, likedStoriesPage.firstChild);
+                            storiesSection.appendChild(storyElement);
                         })
                         .catch(error => {
                             console.error('Error fetching story details:', error);
                         });
-                }                
+                }
+            });
+
+            // Add a DOM element to the page to update the liked comments
+            Object.keys(likedComments).forEach(commentId => {
+                if (likedComments[commentId]) {
+                    fetch(`https://hacker-news.firebaseio.com/v0/item/${commentId}.json`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const { text = 'No Text', time } = data;
+                            const date = new Date(time * 1000).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
+                            const commentElement = document.createElement('div');
+                            commentElement.innerHTML = `
+                                <p style="color: black;">${text}</p>
+                                <p style="color: black;">${date}</p>
+                                <button onclick="removeLikedComment('${commentId}')">Remove</button>
+                                <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
+                            `;
+                            commentsSection.appendChild(commentElement);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching comment details:', error);
+                        });
+                }
             });
         });
-        </script>
+
+        // Function to remove a liked story
+        function removeLikedStory(storyId) {
+            const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
+            delete likedStories[storyId];
+            localStorage.setItem('likedStories', JSON.stringify(likedStories));
+            location.reload();
+        }
+
+        // Function to remove a liked comment
+        function removeLikedComment(commentId) {
+            const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
+            delete likedComments[commentId];
+            localStorage.setItem('likedComments', JSON.stringify(likedComments));
+            location.reload();
+        }
+    </script>
         <button id="comments-button">Comments</button>
         <script>
             // Add a comments section to each story
@@ -317,18 +373,17 @@
                 }
             });
 
-            // Display current time and day of the week
+            // Display current time
             function displayCurrentTime() {
                 const currentTime = new Date().toLocaleString('en-UK', {
                     hour12: false,
                     hourCycle: 'h23',
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
+                    day: '2-digit',
+                    month: '2-digit',
                     year: 'numeric',
                     hour: 'numeric',
                     minute: 'numeric'
-                });
+                }).replace(',', '');
                 document.getElementById('current-time').textContent = `${currentTime}`;
             }
             setInterval(displayCurrentTime, 60000);
@@ -1388,6 +1443,8 @@
 <footer>
     <center>
         <hr>
+        Do you want to Contribute?
+        <p><a href="https://github.com/machaddr/OpenJournal">GitHub</a></p>
         Android +7.0 <a href="https://openjournal.eu.org/download/OpenJournal.apk">APK</a>
         <p></p>
         Windows 10/11 x86_64 <a href="https://openjournal.eu.org/download/OpenJournal.exe">EXE</a>
