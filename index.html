@@ -114,16 +114,27 @@
                     fetch(`https://hacker-news.firebaseio.com/v0/item/${commentId}.json`)
                         .then(response => response.json())
                         .then(data => {
-                            const { text = 'No Text', time } = data;
+                            const { text = 'No Text', time, parent } = data;
                             const date = new Date(time * 1000).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
-                            const commentElement = document.createElement('div');
-                            commentElement.innerHTML = `
-                                <p style="color: black;">${text}</p>
-                                <p style="color: black;">${date}</p>
-                                <button onclick="removeLikedComment('${commentId}')">Remove</button>
-                                <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
-                            `;
-                            commentsSection.appendChild(commentElement);
+
+                            // Fetch the story details
+                            fetch(`https://hacker-news.firebaseio.com/v0/item/${parent}.json`)
+                                .then(response => response.json())
+                                .then(storyData => {
+                                    const storyUrl = storyData.url || '#';
+                                    const commentElement = document.createElement('div');
+                                    commentElement.innerHTML = `
+                                        <p style="color: black;">${text}</p>
+                                        <p style="color: black;">Source: <a href="${storyUrl}" target="_blank">${storyUrl.length > 30 ? storyUrl.substring(0, 30) + '...' : storyUrl}</a></p>
+                                        <p style="color: black;">By: ${data.by} on ${date.replace(',', '')}</p>
+                                        <button onclick="removeLikedComment('${commentId}')">Remove</button>
+                                        <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
+                                    `;
+                                    commentsSection.appendChild(commentElement);
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching story details:', error);
+                                });
                         })
                         .catch(error => {
                             console.error('Error fetching comment details:', error);
