@@ -172,36 +172,6 @@ header.Brown {
 }
 
 /* Set the font family and size for the entire page */
-body.Monokai {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    background-color: #272822;
-    color: #F8F8F2;
-}
-
-/* Style the header */
-header.Monokai {
-    background-color: #272822;
-    color: #F8F8F2;
-    padding: 20px;
-}
-
-/* Set the font family and size for the entire page */
-body.Solarized {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    background-color: #fdf6e3;
-    color: #657b83;
-}
-
-/* Style the header */
-header.Solarized {
-    background-color: #073642;
-    color: #fdf6e3;
-    padding: 20px;
-}
-
-/* Set the font family and size for the entire page */
 body.Purple {
     font-family: Arial, sans-serif;
     font-size: 16px;
