@@ -92,7 +92,8 @@
         });
     
         async function searchArxiv(query) {
-            const response = await fetch(`https://export.arxiv.org/api/query?search_query=${query}&start=0&max_results=32`);
+            const newsEntries = document.querySelector('#news-entries').value;
+            const response = await fetch(`https://export.arxiv.org/api/query?search_query=${query}&start=0&max_results=${newsEntries}`);
             const text = await response.text();
             const parser = new DOMParser();
             const xml = parser.parseFromString(text, 'text/xml');
