@@ -78,6 +78,7 @@
                 const searchResults = document.querySelector('#searchResults');
                 searchResults.innerHTML = ''; // Clear existing content to avoid duplication
                 results.forEach((result, index) => {
+                    const paperId = btoa(result.title); // Use base64 encoding of the title as a unique identifier
                     const div = document.createElement('div');
                     div.innerHTML = `
                         <h2>${result.title}</h2>
@@ -85,12 +86,12 @@
                         <p>${result.summary}</p>
                         <p><a href="${result.pdf}" target="_blank">PDF</a></p>
                         <p><strong>Date:</strong> ${result.date}</p>
-                        <button id="like-button-${index}" class="like-button" data-paper-id="${index}" data-title="${result.title}" data-authors="${result.authors.join(', ')}" data-summary="${result.summary}" data-pdf="${result.pdf}" data-date="${result.date}" data-liked="false">&#x2661;</button>
-                        <span class="like-count" id="like-count-${index}">0</span>
+                        <button id="like-button-${paperId}" class="like-button" data-paper-id="${paperId}" data-title="${result.title}" data-authors="${result.authors.join(', ')}" data-summary="${result.summary}" data-pdf="${result.pdf}" data-date="${result.date}" data-liked="false">&#x2661;</button>
+                        <span class="like-count" id="like-count-${paperId}">0</span>
                         <hr style="width: 100%">
                     `;
                     searchResults.appendChild(div);
-                
+    
                     // Add event listener to like button
                     const likeButton = div.querySelector('.like-button');
                     likeButton.addEventListener('click', () => {
@@ -105,7 +106,7 @@
                         likeButton.dataset.liked = !liked;
                         likeButton.innerHTML = liked ? '&#x2661;' : '&#x2665;';
                         likeCount.textContent = liked ? 0 : 1;
-                
+    
                         // Save liked status to localStorage
                         const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
                         if (!liked) {
@@ -115,13 +116,13 @@
                         }
                         localStorage.setItem('likedResearchPapers', JSON.stringify(likedResearchPapers));
                     });
-                
+    
                     // Load liked status from localStorage
                     const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
-                    if (likedResearchPapers[index]) {
+                    if (likedResearchPapers[paperId]) {
                         likeButton.dataset.liked = 'true';
                         likeButton.innerHTML = '&#x2665;';
-                        const likeCount = document.getElementById(`like-count-${index}`);
+                        const likeCount = document.getElementById(`like-count-${paperId}`);
                         likeCount.textContent = 1;
                     }
                 });
