@@ -1,6 +1,6 @@
 /* Set the font family and size for the entire page */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Fira Code', monospace;
     font-size: 12px;
 }
 
