@@ -14,6 +14,8 @@
     <link rel="icon" type="image/png" href="icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -74,7 +76,7 @@
                 const query = document.querySelector('#searchInput').value;
                 const results = await searchArxiv(query);
                 const searchResults = document.querySelector('#searchResults');
-                searchResults.innerHTML = '';
+                searchResults.innerHTML = ''; // Clear existing content to avoid duplication
                 results.forEach((result, index) => {
                     const div = document.createElement('div');
                     div.innerHTML = `
@@ -83,10 +85,45 @@
                         <p>${result.summary}</p>
                         <p><a href="${result.pdf}" target="_blank">PDF</a></p>
                         <p><strong>Date:</strong> ${result.date}</p>
+                        <button id="like-button-${index}" class="like-button" data-paper-id="${index}" data-title="${result.title}" data-authors="${result.authors.join(', ')}" data-summary="${result.summary}" data-pdf="${result.pdf}" data-date="${result.date}" data-liked="false">&#x2661;</button>
+                        <span class="like-count" id="like-count-${index}">0</span>
                         <hr style="width: 100%">
                     `;
                     searchResults.appendChild(div);
-    
+                
+                    // Add event listener to like button
+                    const likeButton = div.querySelector('.like-button');
+                    likeButton.addEventListener('click', () => {
+                        const paperId = likeButton.dataset.paperId;
+                        const title = likeButton.dataset.title;
+                        const authors = likeButton.dataset.authors;
+                        const summary = likeButton.dataset.summary;
+                        const pdf = likeButton.dataset.pdf;
+                        const date = likeButton.dataset.date;
+                        const liked = likeButton.dataset.liked === 'true';
+                        const likeCount = document.getElementById(`like-count-${paperId}`);
+                        likeButton.dataset.liked = !liked;
+                        likeButton.innerHTML = liked ? '&#x2661;' : '&#x2665;';
+                        likeCount.textContent = liked ? 0 : 1;
+                
+                        // Save liked status to localStorage
+                        const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
+                        if (!liked) {
+                            likedResearchPapers[paperId] = { title, authors, summary, pdf, date };
+                        } else {
+                            delete likedResearchPapers[paperId];
+                        }
+                        localStorage.setItem('likedResearchPapers', JSON.stringify(likedResearchPapers));
+                    });
+                
+                    // Load liked status from localStorage
+                    const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
+                    if (likedResearchPapers[index]) {
+                        likeButton.dataset.liked = 'true';
+                        likeButton.innerHTML = '&#x2665;';
+                        const likeCount = document.getElementById(`like-count-${index}`);
+                        likeCount.textContent = 1;
+                    }
                 });
             });
         });
@@ -108,12 +145,12 @@
                 results.push({ title, authors, summary, pdf, date });
             });
             return results;
-        }    
+        }
     </script>
     <button onclick="window.location.href='https://openjournal.eu.org/forum'">Forum</button>
     <button id="hearts-button">My Hearts</button>
     <script>
-        // Create a page called Hearts where the person sees the liked stories and comments
+        // Create a page called Hearts where the person sees the liked stories, comments, and research papers
         const likedStoriesPage = document.createElement('div');
         likedStoriesPage.style.display = 'none';
         likedStoriesPage.style.position = 'fixed';
@@ -127,8 +164,8 @@
         likedStoriesPage.style.padding = '20px';
         likedStoriesPage.style.boxSizing = 'border-box';
         document.body.appendChild(likedStoriesPage);
-
-        // Add an option to remove all entries from the liked stories and comments page
+    
+        // Add an option to remove all entries from the liked stories, comments, and research papers page
         const clearButton = document.createElement('button');
         clearButton.innerHTML = 'Clear All';
         clearButton.style.position = 'fixed';
@@ -137,12 +174,13 @@
         clearButton.addEventListener('click', () => {
             localStorage.removeItem('likedStories');
             localStorage.removeItem('likedComments');
+            localStorage.removeItem('likedResearchPapers');
             likedStoriesPage.innerHTML = '';
             // Refresh to the main page
             location.reload();
         });
         likedStoriesPage.appendChild(clearButton);
-
+    
         const closeButton = document.createElement('button');
         closeButton.innerHTML = 'Close';
         closeButton.style.position = 'fixed';
@@ -152,28 +190,35 @@
             likedStoriesPage.style.display = 'none';
         });
         likedStoriesPage.appendChild(closeButton);
-
+    
         const openButton = document.getElementById('hearts-button');
         openButton.addEventListener('click', () => {
             likedStoriesPage.style.display = 'block';
             likedStoriesPage.innerHTML = ''; // Clear existing content to avoid duplication
             likedStoriesPage.appendChild(clearButton);
             likedStoriesPage.appendChild(closeButton);
-
+    
             const storiesSection = document.createElement('div');
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
             if (Object.keys(likedStories).length > 0) {
                 storiesSection.innerHTML = '<h2>Liked Stories</h2>';
                 likedStoriesPage.appendChild(storiesSection);
             }
-
+    
             const commentsSection = document.createElement('div');
             const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
             if (Object.keys(likedComments).length > 0) {
                 commentsSection.innerHTML = '<h2>Liked Comments</h2>';
                 likedStoriesPage.appendChild(commentsSection);
             }
-
+    
+            const researchSection = document.createElement('div');
+            const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
+            if (Object.keys(likedResearchPapers).length > 0) {
+                researchSection.innerHTML = '<h2>Liked Research Papers</h2>';
+                likedStoriesPage.appendChild(researchSection);
+            }
+    
             // Add a DOM element to the page to update the liked stories
             Object.keys(likedStories).forEach(storyId => {
                 if (likedStories[storyId]) {
@@ -197,7 +242,7 @@
                         });
                 }
             });
-
+    
             // Add a DOM element to the page to update the liked comments
             Object.keys(likedComments).forEach(commentId => {
                 if (likedComments[commentId]) {
@@ -206,7 +251,7 @@
                         .then(data => {
                             const { text = 'No Text', time, parent } = data;
                             const date = new Date(time * 1000).toLocaleString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
-
+    
                             // Fetch the story details
                             fetch(`https://hacker-news.firebaseio.com/v0/item/${parent}.json`)
                                 .then(response => response.json())
@@ -231,8 +276,26 @@
                         });
                 }
             });
+    
+            // Add a DOM element to the page to update the liked research papers
+            Object.keys(likedResearchPapers).forEach(paperId => {
+                if (likedResearchPapers[paperId]) {
+                    const paper = likedResearchPapers[paperId];
+                    const paperElement = document.createElement('div');
+                    paperElement.innerHTML = `
+                        <h4><a href="${paper.pdf}" style="user-select: none;">${paper.title}</a></h4>
+                        <p style="color: black;">Authors: ${paper.authors}</p>
+                        <p style="color: black;">${paper.summary}</p>
+                        <p><a href="${paper.pdf}" target="_blank">PDF</a></p>
+                        <p style="color: black;">Date: ${paper.date}</p>
+                        <button onclick="removeLikedResearchPaper('${paperId}')">Remove</button>
+                        <hr style="background-color: white; width: 100%; height: 2px; margin-top: 20px; margin-bottom: 20px;">
+                    `;
+                    researchSection.appendChild(paperElement);
+                }
+            });
         });
-
+    
         // Function to remove a liked story
         function removeLikedStory(storyId) {
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
@@ -240,12 +303,20 @@
             localStorage.setItem('likedStories', JSON.stringify(likedStories));
             location.reload();
         }
-
+    
         // Function to remove a liked comment
         function removeLikedComment(commentId) {
             const likedComments = JSON.parse(localStorage.getItem('likedComments')) || {};
             delete likedComments[commentId];
             localStorage.setItem('likedComments', JSON.stringify(likedComments));
+            location.reload();
+        }
+    
+        // Function to remove a liked research paper
+        function removeLikedResearchPaper(paperId) {
+            const likedResearchPapers = JSON.parse(localStorage.getItem('likedResearchPapers')) || {};
+            delete likedResearchPapers[paperId];
+            localStorage.setItem('likedResearchPapers', JSON.stringify(likedResearchPapers));
             location.reload();
         }
     </script>
