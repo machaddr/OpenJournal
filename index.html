@@ -19,6 +19,81 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Drop Menu code with top buttons inside -->
+    <button id="drop-menu" style="margin-bottom: 20px">&#8226;</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = ['current-time', 'research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
+            const dropMenu = document.getElementById('drop-menu');
+        
+            const hideButtons = () => {
+                buttons.forEach(button => {
+                    const element = document.getElementById(button);
+                    if (element) {
+                        element.style.position = 'absolute'; // Remove from layout
+                        element.style.visibility = 'hidden'; // Make invisible
+                    }
+                });
+                localStorage.setItem('buttonsExpanded', 'false');
+            };
+        
+            const showButtons = () => {
+                buttons.forEach(button => {
+                    const element = document.getElementById(button);
+                    if (element) {
+                        element.style.position = 'static'; // Return to normal flow
+                        element.style.visibility = 'visible'; // Show the button
+                        if (window.innerWidth < 600) {
+                            element.style.display = 'block'; // Display as block
+                        } else {
+                            element.style.display = ''; // Reset display
+                            element.style.margin = ''; // Reset margin
+                        }
+                    }
+                });
+                localStorage.setItem('buttonsExpanded', 'true');
+            };
+        
+            const checkWidth = () => {
+                if (window.innerWidth < 600) {
+                    hideButtons();
+                } else {
+                    showButtons();
+                }
+            };
+        
+            // Initially, hide or show buttons based on the width and localStorage state
+            if (localStorage.getItem('buttonsExpanded') === 'true') {
+                showButtons();
+            } else {
+                hideButtons();
+            }
+        
+            // Add event listener for window resize
+            window.addEventListener('resize', checkWidth);
+        
+            // Click event on the drop-down menu
+            dropMenu.addEventListener('click', () => {
+                buttons.forEach(button => {
+                    const element = document.getElementById(button);
+                    if (element) {
+                        if (element.style.visibility === 'hidden') {
+                            element.style.position = 'static'; // Return to normal flow
+                            element.style.visibility = 'visible'; // Show the button
+                            if (window.innerWidth < 600) {
+                                element.style.display = 'block'; // Display as block                                
+                            }
+                            localStorage.setItem('buttonsExpanded', 'true');
+                        } else {
+                            element.style.position = 'absolute'; // Remove from layout
+                            element.style.visibility = 'hidden'; // Hide the button
+                            localStorage.setItem('buttonsExpanded', 'false');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
     <button><div><span id="current-time"></span></div></button>
     <button id="research-button">Research</button>
     <script>
@@ -148,7 +223,7 @@
             return results;
         }
     </script>
-    <button onclick="window.location.href='https://openjournal.eu.org/forum'">Forum</button>
+    <button onclick="window.location.href='https://openjournal.eu.org/forum'" id="forum-button">Forum</button>
     <button id="hearts-button">My Hearts</button>
     <script>
         // Create a page called Hearts where the person sees the liked stories, comments, and research papers
