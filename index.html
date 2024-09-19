@@ -20,7 +20,7 @@
 </head>
 <body>
     <!-- Drop Menu code with top buttons inside -->
-    <button id="drop-menu" style="margin-bottom: 20px">&#8226;</button>
+    <button id="drop-menu" style="margin-bottom: 10px">&#8226;</button>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const buttons = ['current-time', 'research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
@@ -94,7 +94,7 @@
             });
         });
     </script>
-    <button><div><span id="current-time"></span></div></button>
+    <button id="current-time"></button>
     <button id="research-button">Research</button>
     <script>
         // Create a page called Research where the person can search for papers on arXiv
@@ -558,7 +558,7 @@
                 }
             });
         </script>
-        <button><a href="https://meet.hn" id="meet-button" style="color: black; text-decoration: none;">Meet</a></button>
+        <button id="meet-button" style="color: black; text-decoration: none;" onclick="window.location.href='https://meet.hn'">Meet</button>
     <div style="margin-top: 20px;"></div>
     <button id="menu-button">Menu</button>
     <div id="menu" style="display: none;">
