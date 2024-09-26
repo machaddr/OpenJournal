@@ -287,7 +287,7 @@
             likedStoriesPage.appendChild(closeButton);
     
             // Push a new state to the history stack
-            history.pushState({ page: 'likedStories' }, 'Liked Stories', '#likedStories');
+            history.pushState({ page: 'my-hearts' }, 'My Hearts', '#my-hearts');
     
             const storiesSection = document.createElement('div');
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
@@ -389,7 +389,7 @@
     
         // Listen for the popstate event to handle back navigation
         window.addEventListener('popstate', (event) => {
-            if (event.state && event.state.page === 'likedStories') {
+            if (event.state && event.state.page === 'my-hearts') {
                 likedStoriesPage.style.display = 'block';
             } else {
                 likedStoriesPage.style.display = 'none';
@@ -419,9 +419,9 @@
             localStorage.setItem('likedResearchPapers', JSON.stringify(likedResearchPapers));
             location.reload();
         }
-
+    
         // Use forward history state to show the Hearts section
-        if (history.state && history.state.page === 'likedStories') {
+        if (history.state && history.state.page === 'my-hearts') {
             likedStoriesPage.style.display = 'block';
         }
     </script>
