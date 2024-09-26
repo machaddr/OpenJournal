@@ -95,6 +95,14 @@
                 });
             });
         });
+
+        // clear #about and #research links if in the homepage
+        if (window.location.href === 'https://openjournal.eu.org/') {
+            document.getElementById('about-button').style.display = 'none';
+            document.getElementById('research-button').style.display = 'none';
+            document.getElementById('hearts-button').style.display = 'none';
+            document.getElementById('comments-button').style.display = 'none';
+        }
     </script>
     <button id="current-time"></button>
     <button id="about-button">About</button>
@@ -173,7 +181,6 @@
                 <div style="margin-bottom: 80px;"></div>
             `;
             aboutPage.appendChild(closeAboutButton);
-
         });
     
         // Handle the popstate event to manage back/forward navigation
