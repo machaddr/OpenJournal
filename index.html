@@ -82,7 +82,7 @@
                             element.style.position = 'static'; // Return to normal flow
                             element.style.visibility = 'visible'; // Show the button
                             element.style.marginBottom = '10px'; // Add bottom margin
-                            if (window.innerWidth < 600) {
+                            if (window.innerWidth < 700) {
                                 element.style.display = 'block'; // Display as block                                
                             }
                             localStorage.setItem('buttonsExpanded', 'true');
@@ -130,7 +130,6 @@
         openAboutButton.addEventListener('click', () => {
             aboutPage.style.display = 'block';
             aboutPage.innerHTML = ''; // Clear existing content to avoid duplication
-            aboutPage.appendChild(closeAboutButton);
     
             // Push a new state to the history stack
             history.pushState({ page: 'about' }, 'About', '#about');
@@ -173,6 +172,8 @@
                 </div>
                 <div style="margin-bottom: 80px;"></div>
             `;
+            aboutPage.appendChild(closeAboutButton);
+
         });
     
         // Handle the popstate event to manage back/forward navigation
