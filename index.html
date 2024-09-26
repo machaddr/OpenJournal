@@ -122,6 +122,7 @@
         closeResearchButton.style.left = '30px';
         closeResearchButton.addEventListener('click', () => {
             researchPage.style.display = 'none';
+            history.back(); // Go back in history when closing the research page
         });
         researchPage.appendChild(closeResearchButton);
     
@@ -131,6 +132,9 @@
             researchPage.style.display = 'block';
             researchPage.innerHTML = ''; // Clear existing content to avoid duplication
             researchPage.appendChild(closeResearchButton);
+    
+            // Push a new state to the history stack
+            history.pushState({ page: 'research' }, 'Research', '#research');
     
             // Create a form to search for papers on arXiv
             const form = document.createElement('form');
@@ -224,6 +228,11 @@
             });
             return results;
         }
+    
+        // If user uses history back button, close the research page
+        window.addEventListener('popstate', () => {
+            researchPage.style.display = 'none';
+        });
     </script>
     <button onclick="window.location.href='https://openjournal.eu.org/forum'" id="forum-button">Forum</button>
     <button id="hearts-button">My Hearts</button>
@@ -266,6 +275,7 @@
         closeButton.style.left = '30px';
         closeButton.addEventListener('click', () => {
             likedStoriesPage.style.display = 'none';
+            history.back(); // Go back in history when closing the page
         });
         likedStoriesPage.appendChild(closeButton);
     
@@ -275,6 +285,9 @@
             likedStoriesPage.innerHTML = ''; // Clear existing content to avoid duplication
             likedStoriesPage.appendChild(clearButton);
             likedStoriesPage.appendChild(closeButton);
+    
+            // Push a new state to the history stack
+            history.pushState({ page: 'likedStories' }, 'Liked Stories', '#likedStories');
     
             const storiesSection = document.createElement('div');
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
@@ -374,6 +387,15 @@
             });
         });
     
+        // Listen for the popstate event to handle back navigation
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.page === 'likedStories') {
+                likedStoriesPage.style.display = 'block';
+            } else {
+                likedStoriesPage.style.display = 'none';
+            }
+        });
+    
         // Function to remove a liked story
         function removeLikedStory(storyId) {
             const likedStories = JSON.parse(localStorage.getItem('likedStories')) || {};
@@ -396,6 +418,11 @@
             delete likedResearchPapers[paperId];
             localStorage.setItem('likedResearchPapers', JSON.stringify(likedResearchPapers));
             location.reload();
+        }
+
+        // Use forward history state to show the Hearts section
+        if (history.state && history.state.page === 'likedStories') {
+            likedStoriesPage.style.display = 'block';
         }
     </script>
         <button id="comments-button">Comments</button>
@@ -422,6 +449,7 @@
             closeCommentsButton.style.left = '40px';
             closeCommentsButton.addEventListener('click', () => {
                 commentsSection.style.display = 'none';
+                history.back(); // Navigate back in history
             });
             commentsSection.appendChild(closeCommentsButton);
             
@@ -436,6 +464,9 @@
                 commentsSection.style.display = 'block';
                 commentsSection.innerHTML = ''; // Clear existing content to avoid duplication
                 commentsSection.appendChild(closeCommentsButton);
+                
+                // Push a new state to the history stack
+                history.pushState({ commentsOpen: true }, 'Comments', '#comments');
                 
                 // Fetch top stories from Hacker News
                 fetch('https://hacker-news.firebaseio.com/v0/topstories.json')
@@ -559,6 +590,20 @@
                         });
                 }
             });
+        
+            // Listen for the popstate event to handle back navigation
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.commentsOpen) {
+                    commentsSection.style.display = 'block';
+                } else {
+                    commentsSection.style.display = 'none';
+                }
+            });
+
+            // Use forward history state to show the comments section
+            if (history.state && history.state.commentsOpen) {
+                commentsSection.style.display = 'block';
+            }
         </script>
         <button id="meet-button" style="color: black; text-decoration: none;" onclick="window.location.href='https://meet.hn'">Meet</button>
     <div style="margin-top: 20px;"></div>
@@ -886,6 +931,7 @@
             const categoryMenu = document.createElement('div');
             categoryMenu.style.display = 'flex';
             categoryMenu.style.justifyContent = 'center';
+            categoryMenu.style.gap = '4px';
             categoryMenu.style.marginTop = '20px';
 
             // Responsive design
