@@ -23,7 +23,7 @@
     <button id="drop-menu" style="margin-bottom: 10px">&#8226;</button>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const buttons = ['research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
+            const buttons = [ 'about-button', 'blog-button', 'research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
             const dropMenu = document.getElementById('drop-menu');
         
             const hideButtons = () => {
@@ -44,7 +44,7 @@
                         element.style.position = 'static'; // Return to normal flow
                         element.style.visibility = 'visible'; // Show the button
                         element.style.marginBottom = '10px'; // Add bottom margin
-                        if (window.innerWidth < 600) {
+                        if (window.innerWidth < 700) {
                             element.style.display = 'block'; // Display as block
                         } else {
                             element.style.display = ''; // Reset display
@@ -56,7 +56,7 @@
             };
         
             const checkWidth = () => {
-                if (window.innerWidth < 600) {
+                if (window.innerWidth < 700) {
                     hideButtons();
                 } else {
                     showButtons();
@@ -97,6 +97,99 @@
         });
     </script>
     <button id="current-time"></button>
+    <button id="about-button">About</button>
+    <script>
+        // Create an OpenJournal about page
+        const aboutPage = document.createElement('div');
+        aboutPage.style.display = 'none';
+        aboutPage.style.position = 'fixed';
+        aboutPage.style.top = '0';
+        aboutPage.style.left = '0';
+        aboutPage.style.width = '100%';
+        aboutPage.style.height = '100%';
+        aboutPage.style.backgroundColor = 'white';
+        aboutPage.style.zIndex = '9999';
+        aboutPage.style.overflow = 'auto';
+        aboutPage.style.padding = '20px';
+        aboutPage.style.boxSizing = 'border-box';
+        document.body.appendChild(aboutPage);
+
+        // Add a close button to the about page
+        const closeAboutButton = document.createElement('button');
+        closeAboutButton.innerHTML = 'Close';
+        closeAboutButton.style.position = 'fixed';
+        closeAboutButton.style.top = '10px';
+        closeAboutButton.style.left = '30px';
+        closeAboutButton.addEventListener('click', () => {
+            aboutPage.style.display = 'none';
+            history.back(); // Go back in history when closing the about page
+        });
+        aboutPage.appendChild(closeAboutButton);
+    
+        const openAboutButton = document.getElementById('about-button');
+        openAboutButton.addEventListener('click', () => {
+            aboutPage.style.display = 'block';
+            aboutPage.innerHTML = ''; // Clear existing content to avoid duplication
+            aboutPage.appendChild(closeAboutButton);
+    
+            // Push a new state to the history stack
+            history.pushState({ page: 'about' }, 'About', '#about');
+    
+            // Add content to the about page
+            aboutPage.innerHTML = `
+                <div style="margin-top: 20px;">
+                    <center><img src="icon.png" alt="Icon" width="100" height="100"></center>
+                    <center><h1>OpenJournal</h1></center>
+                </div>
+                <div style="margin-top: 20px;">
+                    <center><h2>Our Mission</h2></center>
+                    <p>OpenJournal is dedicated to promoting an open internet and open knowledge. We believe that information should be freely accessible to everyone, and we strive to provide a platform where users can stay informed about the latest advancements in technology, science, and research.</p>
+                    <p>Our mission is to create a community where knowledge is shared openly and freely, fostering innovation and collaboration across various fields.</p>
+                    
+                    <center><h2>Open Knowlegde</h2></center>
+                    <p>OpenJournal is committed to the principles of open knowledge, which include:</p>
+                    <ul>
+                        <li><strong>Open Access:</strong> Providing free access to information and research papers.</li>
+                        <li><strong>Open Source:</strong> Supporting open-source software and tools for collaboration.</li>
+                        <li><strong>Open Data:</strong> Encouraging the sharing of data for transparency and reproducibility.</li>
+                        <li><strong>Open Science:</strong> Promoting open science practices for the advancement of research.</li>
+                    </ul>
+    
+                    <center><h2>Open Internet</h2></center>
+                    <p>OpenJournal advocates for an open internet that is free from censorship and restrictions. We believe in the power of the internet to connect people, share ideas, and foster creativity.</p>
+                    <p>By promoting an open internet, we aim to create a space where users can freely express themselves, access information, and engage in meaningful discussions.</p>
+                    <center><h2>Guide to Using OpenJournal</h2></center>
+                    <p>Welcome to OpenJournal! Here’s a quick guide to help you navigate and make the most of our website:</p>
+                    <ul>
+                        <li><strong>Headlines:</strong> Stay up-to-date with the latest news and research papers. Our headlines cover a wide range of topics including technology, open source, science, mathematics, physics, programming, and research.</li>
+                        <li><strong>Blog:</strong> Read our blog posts on various topics related to technology, science, and research. Stay informed about the latest trends and developments in these fields.</li>
+                        <li><strong>Forum:</strong> Engage in discussions with other users on our forum. Share your thoughts, ask questions, and collaborate on latest headlines and research papers.</li>
+                        <li><strong>My Hearts:</strong> Save your favorite stories, comments, and research papers to your hearts. You can access them anytime from the 'My Hearts' section.</li>
+                        <li><strong>Research:</strong> Use our research page to search for papers on arXiv. You can like and save papers for future reference.</li>
+                        <li><strong>Comments:</strong> View comments on stories and view engaged discussions with other users. You can also save your favorite comments to your hearts.</li>
+                        <li><strong>Meet:</strong> Connect with other users through our 'Meet' section. Engage in real-time discussions and collaborations.</li>
+                    </ul>
+                    <p>We hope you enjoy using OpenJournal and find it to be a valuable resource for staying informed and connected. If you have any questions or feedback, feel free to reach out to us.</p>
+                </div>
+                <div style="margin-bottom: 80px;"></div>
+            `;
+        });
+    
+        // Handle the popstate event to manage back/forward navigation
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.page === 'about') {
+                aboutPage.style.display = 'block';
+            } else {
+                aboutPage.style.display = 'none';
+            }
+        });
+    
+        // Use forward history state to show the Hearts section
+        if (history.state && history.state.page === 'about') {
+            aboutPage.style.display = 'block';
+        }
+    </script>
+    <button onclick="window.location.href='https://openjournal.eu.org/blog'" id="blog-button">Blog</button>
     <button id="research-button">Research</button>
     <script>
         // Create a page called Research where the person can search for papers on arXiv
@@ -139,7 +232,7 @@
             // Create a form to search for papers on arXiv
             const form = document.createElement('form');
             form.innerHTML = `
-                <div style="margin-top: 20px;"">
+                <div style="margin-top: 20px;">
                     <center><img src="icon.png" alt="Icon" width="100" height="100"></center>
                     <center><h1>OpenJournal Research</h1></center>
                 </div>
@@ -229,10 +322,19 @@
             return results;
         }
     
-        // If user uses history back button, close the research page
-        window.addEventListener('popstate', () => {
-            researchPage.style.display = 'none';
+        // Handle the popstate event to manage back/forward navigation
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.page === 'research') {
+                researchPage.style.display = 'block';
+            } else {
+                researchPage.style.display = 'none';
+            }
         });
+    
+        // Use forward history state to show the Research section
+        if (history.state && history.state.page === 'research') {
+            researchPage.style.display = 'block';
+        }
     </script>
     <button onclick="window.location.href='https://openjournal.eu.org/forum'" id="forum-button">Forum</button>
     <button id="hearts-button">My Hearts</button>
