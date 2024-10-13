@@ -23,7 +23,7 @@
     <button id="drop-menu" style="margin-bottom: 10px">&#8226;</button>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const buttons = [ 'about-button', 'blog-button', 'research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
+            const buttons = [ 'about-button', 'blogs-button', 'research-button', 'forum-button', 'hearts-button', 'comments-button', 'meet-button'];
             const dropMenu = document.getElementById('drop-menu');
         
             const hideButtons = () => {
@@ -181,12 +181,12 @@
                         <li><strong>Show Numbers Box:</strong> Show or disable the numbers of the headlines.</li>
                         <li><strong>Endless Scroll Box:</strong> Enable or disable the endless scroll feature on the home page.</li>
                         <li><strong>About Page:</strong> Learn more about OpenJournal's mission and values. You can also find a guide on how to use the website.</li>
-                        <li><strong>Blog Page:</strong> Read our blog posts on various topics related to technology, science, and research. Stay informed about the latest trends and developments in these fields.</li>
+                        <li><strong>Blogs Link:</strong> Search throught a humanly curated list of fine personal & independent blogs that are updated regularly.</li>
                         <li><strong>Research Page:</strong> Use our research page to search for papers on arXiv. You can like and save papers for future reference.</li>
                         <li><strong>Forum Page:</strong> Engage in discussions with other users on our forum. Share your thoughts, ask questions, and collaborate on latest headlines and research papers.</li>
                         <li><strong>My Hearts Page:</strong> Save your favorite stories, comments, and research papers to your hearts. You can access them anytime from the 'My Hearts' section page.</li>
                         <li><strong>Comments Page:</strong> View comments on stories and view engaged discussions with other users. You can also save your favorite comments to your hearts.</li>
-                        <li><strong>Meet Page:</strong> Connect with other users at /dev/earth0 through the 'Meet' section. Engage in real-time discussions and collaborations. You can freely browse who is in your city.</li>
+                        <li><strong>Meet Link:</strong> Connect with other users at /dev/earth0 through the 'Meet' section. Engage in real-time discussions and collaborations. You can freely browse who is in your city.</li>
                     </ul>
                     <p>We hope you enjoy using OpenJournal and find it to be a valuable resource for staying informed and connected. If you have any questions or feedback, feel free to reach out to us.</p>
                 </div>
@@ -209,7 +209,7 @@
             aboutPage.style.display = 'block';
         }
     </script>
-    <button onclick="window.location.href='https://openjournal.eu.org/blog'" id="blog-button">Blog</button>
+    <button onclick="window.location.href='https://blogroll.org'" id="blogs-button">Blogs</button>
     <button id="research-button">Research</button>
     <script>
         // Create a page called Research where the person can search for papers on arXiv
@@ -758,15 +758,15 @@
         <div>
             <label for="categories">Categories:</label>
             <select id="categories">
-                <option value="Yes">Yes</option>
-                <option value="No" selected>No</option>
+                <option value="Yes" selected>Yes</option>
+                <option value="No">No</option>
             </select>
         </div>
         <div>
             <label for="navigation">Navigation:</label>
             <select id="navigation">
-                <option value="Yes">Yes</option>
-                <option value="No" selected>No</option>
+                <option value="Yes" selected>Yes</option>
+                <option value="No">No</option>
             </select>
         </div>
         <div>
@@ -2072,7 +2072,7 @@
             <div><a href="#" onclick="ggs_ggseal()"><img src="https://static.greengeeks.com/ggseal/Green_2.png"></a><script>function ggs_ggseal(){window.open("https://my.greengeeks.com/seal/","_blank")}</script></div>
             <!-- End GreenGeeks Seal Code -->
             <p></p>
-            <p style="margin-bottom: 80px;">Copyright &copy; 2024 <a href="https://machaddr.substack.com">Andr&eacute Machado</a></p>
+            <p style="margin-bottom: 80px;">Copyright &copy; 2024 Made with 🤎 by <a href="https://machaddr.substack.com">Andr&eacute Machado</a></p>
             <p></p>
         </h6>
     </center>
